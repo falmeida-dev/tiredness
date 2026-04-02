@@ -90,23 +90,23 @@
         @apply size-12;
     }
 
-    .home-balance-card {
+    .home-phrase-card {
         @apply my-2.5 min-h-50 justify-between gap-5 rounded-bl-4xl rounded-tr-4xl bg-accent p-6;
     }
 
-    .home-balance-label {
+    .home-phrase-label {
         @apply text-xl font-sans-semibold text-white/80;
     }
 
-    .home-balance-row {
+    .home-phrase-row {
         @apply flex-row items-center justify-between;
     }
 
-    .home-balance-amount {
-        @apply text-4xl font-sans-extrabold text-white;
+    .home-phrase-amount {
+        @apply text-2xl font-sans-extrabold text-white;
     }
 
-    .home-balance-date {
+    .home-phrase-date {
         @apply text-xl font-sans-medium text-white;
     }
 
@@ -151,7 +151,7 @@
     }
 
     .sub-card {
-        @apply rounded-2xl border border-border p-4;
+        @apply rounded-2xl border h-40 justify-center border-border p-4 bg-card;
     }
 
     .sub-card-expanded {
@@ -163,11 +163,11 @@
     }
 
     .sub-main {
-        @apply min-w-0 flex-1 flex-row items-center gap-3;
+        @apply min-w-0 flex-1 h-40 flex-row items-center gap-3;
     }
 
     .sub-icon {
-        @apply size-16 rounded-lg;
+        @apply size-16 rounded-lg bg-accent;
     }
 
     .sub-copy {

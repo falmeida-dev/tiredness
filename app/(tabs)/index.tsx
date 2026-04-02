@@ -1,25 +1,70 @@
+import Card from "@/components/Card";
+import ListHeading from "@/components/ListHeading";
+import { FLASHCARDS, HOME_PHRASES, HOME_USER } from "@/constants/data";
 import "@/global.css";
-import { Link } from "expo-router";
 import { styled } from "nativewind";
-import { Text } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView)
 
 export default function App() {
+
+    // trocar a mensagem de acordo com o horário do dia, se for dia "Bom dia", se for tarde "Boa tarde" e se for noite "Boa noite"
+    const hour = new Date().getHours();
+    const greeting = hour < 12 ? "Bom dia" : hour < 18 ? "Boa tarde" : "Boa noite";
+
+
+
+
     return (
         <SafeAreaView className="flex-1 bg-background p-5">
-            <Text className="text-7xl font-sans-extrabold font-bold ">
-                Home
-            </Text>
-            <Text className="text-7xl font-bold ">
-                Principal
-            </Text>
+                
+                {/* cards -  */}
+                <FlatList
+                    ListHeaderComponent={()=>(
+                        <>
+                            {/* Header - texto de bem vindo e o nome do usuário vindo do constants/data.ts */}
+                            <View className="home-header">
+                                <View className="flex-1 mt-2">
+                                    <Text className="text-xl font-sans-light tracking-widest">
+                                        Bem-vindo de volta
+                                    </Text>
+                                    <Text className=" text-6xl mt-3 font-sans-bold ">
+                                        {greeting}, {HOME_USER.name}!
+                                    </Text>
+                                </View>
+                            </View>
+                            {/* Fim header */}
 
-            <Link href={"../onboarding"} className="mt-4 rounded bg-primary font-sans-bold text-white p-3 font-medium">Ir para Onboarding</Link>
-            <Link href={"../(auth)/sign-in"} className="mt-4 rounded bg-primary font-sans-bold text-white p-3 font-medium">Criar conta</Link>
-            <Link href={"../(auth)/sign-up"} className="mt-4 rounded bg-primary font-sans-bold text-white p-3 font-medium">Entrar</Link>
+                            {/* Card da frase */}
+                            <View className="home-phrase-card mt-2">
+                                <Text className="home-phrase-label">Frase do dia</Text>
 
+                                <View className="home-phrase-row">
+                                    <Text className="home-phrase-amount">"{HOME_PHRASES.motivational}"</Text>
+                                    
+                                </View>
+                                <View className="home-phrase-row">
+                                    <Text className="home-phrase-date italic">{HOME_PHRASES.author}</Text>
+                                </View>
+                            </View>
+                            {/* fim do card de frase */}
+
+                            {/* subtitulo - Diários recentes */}
+                            <ListHeading title="Ações rápidas" />
+                        </>
+                    )}
+                    data={FLASHCARDS}
+                    keyExtractor={(item) => item.id}
+                    renderItem={({ item }) => (
+                        <Card title={item.title} description={item.description} img={item.img}  color={item.color} page={item.page}/>
+                )}
+                ItemSeparatorComponent={()=> <View className="h-4"/>}
+                showsVerticalScrollIndicator={false}
+                ListEmptyComponent={<Text className="home-empty-state">Nenhuma ação disponível</Text>}
+                contentContainerClassName="pb-30"
+                />
         </SafeAreaView>
     );
 }
