@@ -8,7 +8,7 @@ const SafeAreaView = styled(RNSafeAreaView)
 const Gratitude = () => {
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
-      <Text>gratitude</Text>
+      <Text>Diário de Gratidão</Text>
     </SafeAreaView>
   )
 }

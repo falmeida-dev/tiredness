@@ -19,10 +19,6 @@ const TabLayout = () => {
             </View>
         )
     }
-    
-    
-
-
    return( 
         <Tabs 
             screenOptions={{headerShown: false,
