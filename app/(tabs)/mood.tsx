@@ -7,7 +7,7 @@ const SafeAreaView = styled(RNSafeAreaView)
 const Mood = () => {
   return (
     <SafeAreaView className="flex-1 bg-background p-5">
-      <Text>mood</Text>
+      <Text>Humor</Text>
     </SafeAreaView>
   )
 }
