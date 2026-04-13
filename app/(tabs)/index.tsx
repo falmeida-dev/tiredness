@@ -1,9 +1,11 @@
 import Card from "@/components/Card";
 import ListHeading from "@/components/ListHeading";
+import { MoodSelector } from "@/components/MoodSelector";
 import { FLASHCARDS, HOME_PHRASES } from "@/constants/data";
 import "@/global.css";
 import { useAuth, useUser } from "@clerk/expo";
 import { styled } from "nativewind";
+import { useState } from "react";
 import { FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
@@ -12,6 +14,7 @@ const SafeAreaView = styled(RNSafeAreaView)
 export default function App() {
     const { user } = useUser();
     const { signOut } = useAuth();
+    const [mood, setMood] = useState<number | null>(null);
     const name = user?.firstName || user?.username || "Amigo";
 
     // trocar a mensagem de acordo com o horário do dia, se for dia "Bom dia", se for tarde "Boa tarde" e se for noite "Boa noite"
@@ -59,7 +62,11 @@ export default function App() {
                             </View>
                         </View>
                         {/* fim do card de frase */}
-
+                        {/* Card de selecionar humor */}
+                        <View className="mb-2">
+                            <Text className="text-heading text-lg font-bold my-4">Como você está se sentindo hoje?</Text>
+                            <MoodSelector selectMood={mood} onSelect={setMood} />
+                        </View>
                         {/* subtitulo - Diários recentes */}
                         <ListHeading title="Ações rápidas" />
                     </>

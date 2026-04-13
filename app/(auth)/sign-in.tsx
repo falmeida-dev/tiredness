@@ -116,12 +116,10 @@ export default function SignInScreen() {
                   onChangeText={setEmailAddress}
                   className={`auth-input ${errors.fields.identifier ? 'auth-input-error' : ''}`}
                   keyboardType="email-address"
-                />
-                {errors.fields.identifier && (
-                  <Text className="auth-error">{errors.fields.identifier.message}</Text>
-                )}
+                  />{errors.fields.identifier && (
+                    <Text className="auth-error">{errors.fields.identifier.message}</Text>
+                  )}
               </View>
-
               <View className="auth-field">
                 <Text className="auth-label">Senha</Text>
                 <TextInput
