@@ -7,30 +7,31 @@ import { ActivityIndicator, Image, ScrollView, Text, TextInput, TouchableOpacity
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 
-// isso é para web, expo web, para lidar com o redirecionamento após o login, e completar o processo de autenticação
+{/* isso é para web, expo web, para lidar com o redirecionamento após o login, e completar o processo de autenticação */}
 WebBrowser.maybeCompleteAuthSession();
 
 export default function SignInScreen() {
   useWarmUpBrowser();
 
-  // hook do clerk para login
+  {/* hook do clerk para login */}
   const { signIn, errors, fetchStatus } = useSignIn();
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
 
   const router = useRouter();
-  // estados
+  {/* estados */}
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const [localError, setLocalError] = useState('');
 
-  // define a função para iniciar o fluxo de autenticação com o google
-  // e se der certo joga pra index.tsx 
+  {/*define a função para iniciar o fluxo de autenticação com o google*/}
+  {/* e se der certo joga pra index.tsx */}
   const onGooglePress = useCallback(async () => {
     // 
     try {
       const { createdSessionId, setActive } = await startOAuthFlow();
-      // se a sessão for criada, ativa a sessão e redireciona para a tela principal do app
-      if (createdSessionId) {
+      {/* se a sessão for criada, ativa a sessão e redireciona para a tela principal do app */}
+      if (createdSessionId && setActive) {
+         await setActive({ session: createdSessionId });
         setActive!({ session: createdSessionId });
         router.replace('/(tabs)');
       }
@@ -38,9 +39,9 @@ export default function SignInScreen() {
       console.error('OAuth error', err);
       setLocalError('Erro ao entrar com Google.');
     }
-  }, []);
+  }, [startOAuthFlow, router]);
 
-  // define a função para fazer login usando email e senha
+  {/* define a função para fazer login usando email e senha */}
   const onSignInPress = async () => {
     setLocalError('');
 
@@ -55,22 +56,22 @@ export default function SignInScreen() {
         return;
       }
 
-      // se o login for bem-sucedido, finaliza o processo de autenticação e redireciona para a tela principal do app
+      {/* se o login for bem-sucedido, finaliza o processo de autenticação e redireciona para a tela principal do app */}
       if (signIn.status === 'complete') {
         await signIn.finalize({
-          navigate: ({ decorateUrl }) => {
+          navigate: async ({ session, decorateUrl }) => {
             const url = decorateUrl('/(tabs)');
             if (url.startsWith('http')) {
-              // isso é para web, expo web
+              {/* isso é para web, expo web */}
               router.replace('/(tabs)');
             } else {
-              // isso é para mobile
+              {/* isso é para mobile */}
               router.replace(url as Href);
             }
           },
         });
       } else {
-        // caso o login não seja concluído
+         {/*caso o login não seja concluído */}
         setLocalError('Login incompleto. Verifique suas credenciais.');
       }
     } catch (err: any) {
@@ -79,11 +80,10 @@ export default function SignInScreen() {
     }
   };
 
-  // carregando
+  {/* carregando */}
   const loading = fetchStatus === 'fetching';
 
   return (
-    // tela de login
     <SafeAreaView className="auth-safe-area" style={{ flex: 1, marginTop: 20 }}>
       <ScrollView className="auth-scroll" contentContainerStyle={{ flexGrow: 1 }}>
         <View className="auth-content">
@@ -114,10 +114,10 @@ export default function SignInScreen() {
                   placeholder="Seu e-mail"
                   placeholderTextColor="rgba(0,0,0,0.4)"
                   onChangeText={setEmailAddress}
-                  className={`auth-input ${errors.fields.identifier ? 'auth-input-error' : ''}`}
+                  className={`auth-input ${errors?.fields?.identifier ? 'auth-input-error' : ''}`}
                   keyboardType="email-address"
-                  />{errors.fields.identifier && (
-                    <Text className="auth-error">{errors.fields.identifier.message}</Text>
+                  />{errors?.fields?.identifier && (
+                    <Text className="auth-error">{errors?.fields?.identifier.message}</Text>
                   )}
               </View>
               <View className="auth-field">
@@ -128,10 +128,10 @@ export default function SignInScreen() {
                   placeholderTextColor="rgba(0,0,0,0.4)"
                   secureTextEntry
                   onChangeText={setPassword}
-                  className={`auth-input ${errors.fields.password ? 'auth-input-error' : ''}`}
+                  className={`auth-input ${errors?.fields?.password ? 'auth-input-error' : ''}`}
                 />
-                {errors.fields.password && (
-                  <Text className="auth-error">{errors.fields.password.message}</Text>
+                {errors?.fields?.password && (
+                  <Text className="auth-error">{errors?.fields?.password.message}</Text>
                 )}
               </View>
 
@@ -157,7 +157,7 @@ export default function SignInScreen() {
                 <View className="auth-divider-line" />
               </View>
 
-              // opções de login social
+              {/* opções de login social */}
               <View className="auth-social-row">
                 <TouchableOpacity onPress={onGooglePress} className="auth-social-button">
                   <View className="auth-social-icon">

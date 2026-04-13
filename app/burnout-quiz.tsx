@@ -14,13 +14,13 @@ import {
 import Animated, { FadeIn, FadeInRight, FadeOutLeft, LinearTransition } from 'react-native-reanimated';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-// pega a largura da tela para usar em animações e estilos responsivos
+{/* pega a largura da tela para usar em animações e estilos responsivos */}
 const { width } = Dimensions.get('window');
 
-//tela de quiz para avaliar o nível de burnout do usuário
-//exibe um resultado personalizado com base na pontuação total
+{/*tela de quiz para avaliar o nível de burnout do usuário
+ exibe um resultado personalizado com base na pontuação total*/}
 export default function BurnoutQuizScreen() {
-  // estado para controlar o progresso do quiz, respostas, exibição de resultados e carregamento
+  {/* estado para controlar o progresso do quiz, respostas, exibição de resultados e carregamento*/}
   const router = useRouter();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<number, number>>({});
@@ -35,7 +35,7 @@ export default function BurnoutQuizScreen() {
   const handleSelect = (value: number) => {
     setAnswers({ ...answers, [currentQuestion.id]: value });
     
-    // pula para a proxima pergunta depois de um delau 
+    {/* pula para a proxima pergunta depois de um delau */}
     setTimeout(() => {
       if (currentIndex < totalQuestions - 1) {
         setCurrentIndex(currentIndex + 1);
@@ -45,20 +45,20 @@ export default function BurnoutQuizScreen() {
     }, 300);
   };
 
-  // calcula a pontuacao total e diz o nivel de burnout salva e exibe o resultado 
+  {/*calcula a pontuacao total e diz o nivel de burnout salva e exibe o resultado  */}
   const calculateAndShowResult = async () => {
     setSaving(true);
     const score = Object.values(answers).reduce((acc, val) => acc + val, 0);
     
-    // salva no armazenamento local 
+    {/* salva no armazenamento local */}
     await saveBurnoutResult(score);
     
-    // diz o nivel de burnout com base na pontuacao total
+    {/* diz o nivel de burnout com base na pontuacao total */}
     let level: 'baixo' | 'médio' | 'severo' = 'baixo';
     if (score >= 13) level = 'severo';
     else if (score >= 7) level = 'médio';
 
-    // atualiza o estado com o resultado para exibir a tela de resultados
+    {/* atualiza o estado com o resultado para exibir a tela de resultados */}
     setResult({
       score,
       level,
@@ -69,11 +69,11 @@ export default function BurnoutQuizScreen() {
     setShowResult(true);
   };
 
-  // função para obter os detalhes do resultado com base no nível de burnout
+  {/* função para obter os detalhes do resultado com base no nível de burnout */}
   const getLevelDetails = (level: string) => {
     switch (level) {
       case 'severo':
-        // retorna detalhes para nível severo
+        {/* retorna detalhes para nível severo */}
         return {
           title: 'Nível Severo',
           description: 'Seus sinais indicam um alto nível de esgotamento. É essencial buscar ajuda profissional e priorizar o descanso imediato.',
@@ -100,7 +100,7 @@ export default function BurnoutQuizScreen() {
     }
   };
 
-  // se showResult for true e result existir, exibe a tela de resultados personalizada com base no nível de burnout
+  {/* se showResult for true e result existir, exibe a tela de resultados personalizada com base no nível de burnout */}
   if (showResult && result) {
     const details = getLevelDetails(result.level);
     return (
@@ -134,7 +134,7 @@ export default function BurnoutQuizScreen() {
               <Text className="text-primary text-center text-lg font-sans-medium leading-7 mb-8">
                 {details.description}
               </Text>
-              // exibe a pontuação total com uma barra de progresso visual e um botão para continuar para o dashboard
+              {/*exibe a pontuação total com uma barra de progresso visual e um botão para continuar para o dashboard*/}
               <View className="w-full bg-white/60 rounded-3xl p-6 mb-8 border border-primary/5">
                 <View className="flex-row justify-between items-center mb-3">
                   <Text className="text-primary/60 font-sans-bold uppercase text-xs tracking-wider">Sua Pontuação</Text>
@@ -150,9 +150,9 @@ export default function BurnoutQuizScreen() {
                   />
                 </View>
               </View>
-              // botão para continuar para o dashboard
+             {/* botão para continuar para o dashboard*/}
+             {/* joga o usuario para a tela index.tsx dentro de (tabs) que é a tela home */}
               <TouchableOpacity
-              // joga o usuario para a tela index.tsx dentro de (tabs) que é a tela home
                 onPress={() => router.replace('/(tabs)')}
                 style={{ backgroundColor: '#081126' }}
                 className="w-full py-5 rounded-3xl items-center shadow-lg active:opacity-80"
@@ -169,7 +169,7 @@ export default function BurnoutQuizScreen() {
       </SafeAreaView>
     );
   }
-  // tela de quiz normal para responder as perguntas e calcular o resultado
+  {/* tela de quiz normal para responder as perguntas e calcular o resultado */}
   return (
     <SafeAreaView className="flex-1 bg-background">
       <ScrollView 

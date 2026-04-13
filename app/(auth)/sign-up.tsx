@@ -10,26 +10,25 @@ WebBrowser.maybeCompleteAuthSession();
 
 export default function SignUpScreen() {
   useWarmUpBrowser();
-  // hooks do Clerk para lidar com o cadastro e autenticação via Google
+  {/* hooks do Clerk para lidar com o cadastro e autenticação via Google */}
   const { signUp, errors, fetchStatus } = useSignUp();
   const { startOAuthFlow } = useOAuth({ strategy: 'oauth_google' });
 
   const router = useRouter();
 
-  // estados para armazenar o email, senha, código de verificação e mensagens de erro localmente
+  {/* estados para armazenar o email, senha, código de verificação e mensagens de erro localmente */}
   const [emailAddress, setEmailAddress] = useState('');
   const [password, setPassword] = useState('');
   const [pendingVerification, setPendingVerification] = useState(false);
   const [code, setCode] = useState('');
   const [localError, setLocalError] = useState('');
 
-  // define a função para iniciar o fluxo de autenticação com o google 
-  // e se for bem-sucedido, redireciona para a tela principal do app
+  {/* define a função para iniciar o fluxo de autenticação com o google */}
   const onGooglePress = useCallback(async () => {
     try {
       const { createdSessionId, setActive } = await startOAuthFlow();
 
-      // se a auth der certo e criar uma sessao, ativa ela e manda para a tela do formulario de burnout
+      {/* se a auth der certo e criar uma sessao, ativa ela e manda para a tela do formulario de burnout */}
       if (createdSessionId) {
         setActive!({ session: createdSessionId });
         router.replace('/burnout-quiz');
@@ -40,8 +39,8 @@ export default function SignUpScreen() {
     }
   }, []);
 
-  // define a função para criar uma nova conta usando email e senha, e 
-  // enviar o código de verificação para o email do usuário
+  {/* define a função para criar uma nova conta usando email e senha, e 
+   enviar o código de verificação para o email do usuário */}
   const onSignUpPress = async () => {
     setLocalError('');
     try {
@@ -63,8 +62,8 @@ export default function SignUpScreen() {
     }
   };
 
-  // verifica o código enviado para o email do usuário, e se estiver correto, finaliza o cadastro e redireciona para 
-  // a tela principal do app
+  {/* verifica o código enviado para o email do usuário, e se estiver correto, finaliza o cadastro e redireciona para 
+   a tela principal do app */}
   const onPressVerify = async () => {
     setLocalError('');
     try {
@@ -93,7 +92,7 @@ export default function SignUpScreen() {
 
   const loading = fetchStatus === 'fetching';
 
-  // se o cadastro estiver pendente de verificação, renderiza a tela de verificação de código dop  email
+  {/* se o cadastro estiver pendente de verificação, renderiza a tela de verificação de código dop  email */}
   if (pendingVerification) {
     return (
       <SafeAreaView className="auth-safe-area" style={{ flex: 1 }}>
@@ -137,7 +136,7 @@ export default function SignUpScreen() {
                 {localError ? (
                   <Text className="auth-error text-center">{localError}</Text>
                 ) : null}
-                // botão para verificar o código e finalizar o cadastro
+                {/* botão para verificar o código e finalizar o cadastro */}
                 <TouchableOpacity
                   onPress={onPressVerify}
                   disabled={loading || !code}
@@ -149,7 +148,7 @@ export default function SignUpScreen() {
                     <Text className="auth-button-text">Verificar</Text>
                   )}
                 </TouchableOpacity>
-                // reenvia o codigo para o email caso ele não tenha recebido
+                {/* reenvia o codigo para o email caso ele não tenha recebido */}
                 <TouchableOpacity
                   onPress={() => signUp.verifications.sendEmailCode()}
                   className="auth-secondary-button"
@@ -198,8 +197,8 @@ export default function SignUpScreen() {
                   className={`auth-input ${errors.fields.emailAddress ? 'auth-input-error' : ''}`}
                   keyboardType="email-address"
                 />
-                {errors.fields.emailAddress && (
-                  <Text className="auth-error">{errors.fields.emailAddress.message}</Text>
+                {errors?.fields?.emailAddress && (
+                  <Text className="auth-error">{errors?.fields?.emailAddress.message}</Text>
                 )}
               </View>
 
@@ -211,10 +210,10 @@ export default function SignUpScreen() {
                   placeholderTextColor="rgba(0,0,0,0.4)"
                   secureTextEntry
                   onChangeText={setPassword}
-                  className={`auth-input ${errors.fields.password ? 'auth-input-error' : ''}`}
+                  className={`auth-input ${errors?.fields?.password ? 'auth-input-error' : ''}`}
                 />
-                {errors.fields.password && (
-                  <Text className="auth-error">{errors.fields.password.message}</Text>
+                {errors?.fields?.password && (
+                  <Text className="auth-error">{errors?.fields?.password.message}</Text>
                 )}
               </View>
 
