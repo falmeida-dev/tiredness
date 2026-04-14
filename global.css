@@ -235,11 +235,11 @@
     }
 
     .auth-safe-area {
-        @apply flex-1 bg-background;
+        @apply flex-1 bg-white;
     }
 
     .auth-screen {
-        @apply flex-1 bg-background;
+        @apply flex-1 bg-white;
     }
 
     .auth-scroll {
@@ -283,7 +283,7 @@
     }
 
     .auth-card {
-        @apply mt-8 rounded-3xl border border-border bg-card p-5;
+        @apply mt-30 rounded-xl border border-border p-5;
     }
 
     .auth-form {
@@ -319,11 +319,11 @@
     }
 
     .auth-button-disabled {
-        @apply bg-accent/45;
+        @apply bg-accent/90;
     }
 
     .auth-button-text {
-        @apply text-base font-sans-bold text-primary;
+        @apply text-base font-sans-bold text-white;
     }
 
     .auth-secondary-button {
@@ -356,6 +356,22 @@
 
     .auth-link {
         @apply text-sm font-sans-bold text-accent;
+    }
+
+    .auth-social-row {
+        @apply mt-2 gap-3;
+    }
+
+    .auth-social-button {
+        @apply flex-row items-center justify-center rounded-2xl border border-border bg-card py-4;
+    }
+
+    .auth-social-icon {
+        @apply mr-3 size-5 items-center justify-center rounded-md bg-white;
+    }
+
+    .auth-social-text {
+        @apply text-base font-sans-semibold text-primary;
     }
 
     .modal-overlay {

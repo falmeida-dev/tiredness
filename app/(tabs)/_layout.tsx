@@ -1,7 +1,8 @@
 import { tabs } from "@/constants/data";
 import { colors, components } from "@/constants/theme";
+import { useAuth } from "@clerk/expo";
 import clsx from "clsx";
-import { Tabs } from "expo-router";
+import { Redirect, Tabs } from "expo-router";
 import { Image, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -9,8 +10,15 @@ const tabBar = components.tabBar;
 
 const TabLayout = () => {
     const insets = useSafeAreaInsets();
+    const { isLoaded, isSignedIn } = useAuth();
+    // se o Clerk ainda não tiver carregado, não mostra nada
+    if (!isLoaded) return null;
+    // se o usuário não estiver logado, redireciona para a tela de login
+    if (!isSignedIn) {
+        return <Redirect href="/(auth)/sign-in" />;
+    }
 
-    const TabIcon = ({ focused, icon}: TabIconProps) => {
+    const TabIcon = ({ focused, icon}: any) => {
         return(
             <View className="tabs-icon">
                 <View className={clsx('tabs-pill', focused && 'tabs-active')}>
@@ -19,6 +27,7 @@ const TabLayout = () => {
             </View>
         )
     }
+    // renderiza as tabs(home, humor, meditar../) do app
    return( 
         <Tabs 
             screenOptions={{headerShown: false,
