@@ -11,7 +11,7 @@ export interface BurnoutResult {
   date: string;
 }
 
-{/* salva o resultado do quiz de burnout no armazenamento local, incluindo a pontuação, o nível e a data*/}
+//  salva o resultado do quiz de burnout no armazenamento local, incluindo a pontuação, o nível e a data
 export const saveBurnoutResult = async (score: number): Promise<void> => {
   let level: BurnoutLevel = 'baixo';
 
@@ -35,7 +35,7 @@ export const saveBurnoutResult = async (score: number): Promise<void> => {
   }
 };
 
-{/* recupera o resultado do quiz de burnout do armazenamento local, retornando a pontuação, o nível e a data, ou null se não houver resultado salvo*/}
+//  recupera o resultado do quiz de burnout do armazenamento local, retornando a pontuação, o nível e a data, ou null se não houver resultado salvo
 export const getBurnoutResult = async (): Promise<BurnoutResult | null> => {
   try {
     const data = await AsyncStorage.getItem(BURNOUT_RESULT_KEY);
@@ -46,7 +46,7 @@ export const getBurnoutResult = async (): Promise<BurnoutResult | null> => {
   }
 };
 
-{/* checa se o quiz de burnout já foi concluído */}
+//  checa se o quiz de burnout já foi concluído 
 export const hasCompletedQuiz = async (): Promise<boolean> => {
   try {
     const completed = await AsyncStorage.getItem(QUIZ_COMPLETED_KEY);
@@ -57,7 +57,7 @@ export const hasCompletedQuiz = async (): Promise<boolean> => {
   }
 };
 
-{/*limpa o resultado do quiz de burnout e o status de conclusão do quiz do armazenamento local, permitindo que o usuário refaça o quiz do zero*/}
+//  limpa o resultado do quiz de burnout e o status de conclusão do quiz do armazenamento local, permitindo que o usuário refaça o quiz do zero
 export const clearQuizStatus = async (): Promise<void> => {
   try {
     await AsyncStorage.removeItem(BURNOUT_RESULT_KEY);
