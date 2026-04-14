@@ -22,7 +22,7 @@ export async function saveBurnoutData(score: number) {
 
 export async function getBurnoutResults() {
     const completo = await AsyncStorage.getItem(KEYS.QUIZ_COMPLETED);
-    // se o quiz não foi respondido, retorna null
+    {/* se o quiz não foi respondido, retorna null */}
     if (!completo) return null;
 
     const score = await AsyncStorage.getItem(KEYS.BURNOUT_SCORE);
@@ -40,7 +40,7 @@ export async function completedQuiz() {
     return value === 'true';
 }
 
-// limpa os dados do quiz
+{/* limpa os dados do quiz */}
 export async function clearBurnoutData() {
     await AsyncStorage.multiRemove([
         KEYS.BURNOUT_SCORE,

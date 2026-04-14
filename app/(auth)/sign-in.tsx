@@ -32,7 +32,6 @@ export default function SignInScreen() {
       {/* se a sessão for criada, ativa a sessão e redireciona para a tela principal do app */}
       if (createdSessionId && setActive) {
          await setActive({ session: createdSessionId });
-        setActive!({ session: createdSessionId });
         router.replace('/(tabs)');
       }
     } catch (err) {

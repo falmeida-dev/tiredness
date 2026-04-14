@@ -33,22 +33,24 @@ export default function BurnoutQuizScreen() {
   const currentQuestion = QUESTIONS[currentIndex];
 
   const handleSelect = (value: number) => {
-    setAnswers({ ...answers, [currentQuestion.id]: value });
+    const allAnswers = { ...answers, [currentQuestion.id]: value};
     
-    {/* pula para a proxima pergunta depois de um delau */}
+    setAnswers(allAnswers);
+
+    {/* pula para a proxima pergunta depois de um delay */}
     setTimeout(() => {
       if (currentIndex < totalQuestions - 1) {
         setCurrentIndex(currentIndex + 1);
       } else {
-        calculateAndShowResult();
+        calculateAndShowResult(allAnswers);
       }
     }, 300);
   };
 
   {/*calcula a pontuacao total e diz o nivel de burnout salva e exibe o resultado  */}
-  const calculateAndShowResult = async () => {
+  const calculateAndShowResult = async (finalAnswers = answers) => {
     setSaving(true);
-    const score = Object.values(answers).reduce((acc, val) => acc + val, 0);
+    const score = Object.values(finalAnswers).reduce((acc, val) => acc + val, 0);
     
     {/* salva no armazenamento local */}
     await saveBurnoutResult(score);
