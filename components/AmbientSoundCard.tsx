@@ -10,8 +10,8 @@ type Props = {
     onPress: () => void;
 }
 
-export const AmbientSoundCard = ({label, icon, isActive, isLoading, onPress}: Props) =>{
-    return(
+export const AmbientSoundCard = ({ label, icon, isActive, isLoading, onPress }: Props) => {
+    return (
         <TouchableOpacity
             onPress={onPress}
             disabled={isLoading}
@@ -19,19 +19,19 @@ export const AmbientSoundCard = ({label, icon, isActive, isLoading, onPress}: Pr
         >
             <View className={`w-14 h-14 rounded items-center justify-center mb-2 ${isActive ? "bg-accent" : 'bg-primary'}`}>
                 {isLoading ? (
-                    <ActivityIndicator size="small" color="#081126"/>
-                ): (
+                    <ActivityIndicator size="small" color="#081126" />
+                ) : (
                     <Ionicons
                         name={icon}
                         size={18}
-                        color={isActive ? '#081126' : '#ea7a53'}
+                        color={isActive ? '#081126' : '#fff'}
                     />
                 )
-            }
+                }
             </View>
 
-            <Text className={`font-medium ${isActive ? 'text-primary' : 'text-accent'}`}>
-            {isLoading ? "Aguarde um pouco." : label}
+            <Text className={`font-medium ${isActive ? 'text-primary' : 'text-primary'}`}>
+                {isLoading ? "" : label}
             </Text>
 
         </TouchableOpacity>

@@ -13,7 +13,7 @@ export const CategoryTab = ({label, icon, isActive, onPress}: Props) =>{
     return(
         <TouchableOpacity
             onPress={onPress}
-            className={`h-12 px-4 rounded-2xl flex-row items-center justify-center mr-3 border border-primary ${isActive ? 'bg-accent' : 'bg-background'}`}
+            className={`h-12 px-4 mb-10 rounded-2xl flex-row items-center justify-center mr-3 border border-primary ${isActive ? 'bg-accent' : 'bg-background'}`}
             activeOpacity={0.7}
         >
             {icon && (

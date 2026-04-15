@@ -9,12 +9,12 @@ const api = axios.create({
 });
 
 export const getMeditations = async (): Promise<AudioTrack[]> =>{
-    const { data } = await api.get<AudioTrack[]>('/tracks/meditations'); 
+    const { data } = await api.get<AudioTrack[]>('/api/tracks/meditations'); 
     return data;
 };
 
 export const getAmbientSounds = async (): Promise<AudioTrack[]> =>{
-    const { data } = await api.get<AudioTrack[]>('/tracks/ambient');
+    const { data } = await api.get<AudioTrack[]>('/api/tracks/ambient');
     return data;
 };
 

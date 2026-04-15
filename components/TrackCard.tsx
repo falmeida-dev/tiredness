@@ -19,20 +19,20 @@ export const TrackCard = ({title, subtitle, duration, isPlaying, isBuffering, on
             className={`bg-background p-4 rounded mb-3 flex-row items-center border ${isActive ? 'border-accent' : 'border-primary'}`}
             activeOpacity={0.7}
         >
-            <View className={`w-12 h-12 rounded items-center justify-center mr-4 ${isActive ? 'bg-background' : 'bg-primary'}`}>
+            <View className={`w-12 h-12 rounded items-center justify-center mr-4 ${isActive ? 'bg-primary' : 'bg-primary'}`}>
                 {isBuffering ? (
                     <ActivityIndicator size="small" color="#081126"/>
                 ): (
                     <Ionicons 
                         name={isPlaying ? 'pause' : 'play'}
                         size={24}
-                        color={isActive ? '#ea7a53' : '#081126'}
+                        color={isActive ? '#fff' : '#fff'}
                     />
                 )}
             </View>
 
             <View className="flex-1">
-                <Text className={`font-bold ${ isActive ? 'text-primary' : 'text-accent'}`}>
+                <Text className={`font-bold ${ isActive ? 'text-accent' : 'text-primary'}`}>
                     {title}
                 </Text>
                 <Text className="text-sm mt-0.5">
