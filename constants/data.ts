@@ -6,11 +6,10 @@ export const tabs = [
     { name: "meditate", title: "meditar", icon: icons.meditate },
     { name: "gratitude", title: "gratidão", icon: icons.gratitude },
     { name: "insights", title: "relatórios", icon: icons.activity },
-
 ]
 
 export const HOME_USER = {
-    name: "Fulano",
+    name: "Amigo(a)!",
 }
 
 export const HOME_PHRASES = {
