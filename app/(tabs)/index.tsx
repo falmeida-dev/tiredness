@@ -1,12 +1,13 @@
 import Card from "@/components/Card";
 import ListHeading from "@/components/ListHeading";
 import { MoodSelector } from "@/components/MoodSelector";
+import { PrimaryButton } from "@/components/PrimaryButton";
 import { FLASHCARDS, HOME_PHRASES } from "@/constants/data";
 import "@/global.css";
 import { useAuth, useUser } from "@clerk/expo";
 import { styled } from "nativewind";
 import { useState } from "react";
-import { FlatList, Text, TouchableOpacity, View } from "react-native";
+import { FlatList, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
 
 const SafeAreaView = styled(RNSafeAreaView)
@@ -79,12 +80,14 @@ export default function App() {
                 ItemSeparatorComponent={() => <View className="h-4" />}
                 // botão de sair da conta
                 ListFooterComponent={() => (
-                    <TouchableOpacity
-                        onPress={onSignOutPress}
-                        className="mt-10 mb-20 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 py-4"
-                    >
-                        <Text className="font-sans-bold text-destructive">Sair da conta</Text>
-                    </TouchableOpacity>
+                    // <TouchableOpacity
+                    //     onPress={onSignOutPress}
+                    //     className="mt-10 mb-20 items-center justify-center rounded-2xl border border-destructive/20 bg-destructive/5 py-4"
+                    // >
+                    //     <Text className="font-sans-bold text-destructive">Sair da conta</Text>
+                    // </TouchableOpacity>
+
+                    <PrimaryButton title="Sair da conta" onPress={onSignOutPress} />
                 )}
                 showsVerticalScrollIndicator={false}
                 ListEmptyComponent={<Text className="home-empty-state">Nenhuma ação disponível</Text>}
