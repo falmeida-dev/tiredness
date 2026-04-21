@@ -2,7 +2,7 @@ import { AudioTrack } from '@/types/track';
 import { MoodEntry, WeeklySummary } from '@/types/mood';
 import axios from 'axios';
 
-const BASE_URL = 'https://api-tiredness.onrender.com';
+const BASE_URL = 'https://api-tiredness-production.up.railway.app';
 
 const api = axios.create({
     baseURL: BASE_URL,
