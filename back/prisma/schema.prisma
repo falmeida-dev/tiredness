@@ -1,0 +1,19 @@
+// Schema Prisma — TiredNess API
+// Aprenda mais: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Tabela de faixas de áudio (meditações e sons ambientes)
+model AudioTrack {
+  id        String @id @default(uuid())
+  title     String
+  category  String // 'MEDITATION' ou 'AMBIENT'
+  duration  Int    // duração em segundos
+  audioUrl  String // URL pública do áudio no Supabase Storage
+}
