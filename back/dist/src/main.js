@@ -8,8 +8,9 @@ async function bootstrap() {
         origin: '*',
     });
     app.setGlobalPrefix('api');
-    await app.listen(process.env.PORT ?? 3000);
-    console.log(`🚀 vrum vrum... API subiu! da um confere nela em localhost:${process.env.PORT ?? 3000}/api`);
+    const port = process.env.PORT || 3000;
+    await app.listen(port, '0.0.0.0');
+    console.log(`API funcionou ${port}`);
 }
 bootstrap();
 //# sourceMappingURL=main.js.map
