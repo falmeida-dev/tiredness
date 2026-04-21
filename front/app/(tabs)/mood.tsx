@@ -1,19 +1,35 @@
 import { EnergySlider } from '@/components/EnergySlider';
-import { MoodSelector } from '@/components/MoodSelector';
+import { MoodSelector, moods } from '@/components/MoodSelector';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { createMoodEntry } from '@/services/api';
+import { useUser } from '@clerk/expo';
 import { Ionicons } from '@expo/vector-icons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import React, { useState } from 'react';
+import { useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useState } from 'react';
 import { Alert, KeyboardAvoidingView, SafeAreaView, ScrollView, Text, TextInput, View } from 'react-native';
 
 
 
 export default function HumorScreen() {
+  // pega o initialMood que veio da Home (se tiver)
+  const { initialMood } = useLocalSearchParams<{ initialMood?: string }>();
 
+  const { user } = useUser();
   const [humor, setHumor] = useState<number | null>(null);
   const [energia, setEnergia] = useState(50);
   const [carregando, setCarregando] = useState(false);
   const [nota, setNota] = useState('');
+
+  // se veio um mood da home, já pré-seleciona o emoji
+  useEffect(() => {
+    if (initialMood !== undefined && initialMood !== null) {
+      const parsed = parseInt(initialMood, 10);
+      if (!isNaN(parsed) && parsed >= 0 && parsed <= 4) {
+        setHumor(parsed);
+      }
+    }
+  }, [initialMood]);
 
   const saveOnStorage = async () => {
     if (humor === null) {
@@ -21,19 +37,31 @@ export default function HumorScreen() {
       return;
     }
 
+    if (!user?.id) {
+      Alert.alert('Erro', 'Usuário não identificado. Faça login novamente.');
+      return;
+    }
+
     setCarregando(true);
 
     try {
-      const response = await fetch('https://api-tiredness.onrender.com', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ humor, energia }),
+      await createMoodEntry({
+        mood: humor,
+        emoji: moods[humor].emoji,
+        energy: energia,
+        note: nota.trim() || undefined,
+        userId: user.id,
       });
 
+      Alert.alert('Salvo!', 'Seu humor e energia foram registrados com sucesso.');
+
+      // limpa o formulário depois de salvar
+      setHumor(null);
+      setEnergia(50);
+      setNota('');
     } catch (error) {
-      Alert.alert('Erro', 'Não foi possível salvar o humor.');
+      console.error('Erro ao salvar humor:', error);
+      Alert.alert('Erro', 'Não foi possível salvar o humor. Tente novamente.');
     } finally {
       setCarregando(false);
     }

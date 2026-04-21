@@ -6,7 +6,9 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 // Tabela de faixas de áudio (meditações e sons ambientes)
@@ -16,4 +18,15 @@ model AudioTrack {
   category  String // 'MEDITATION' ou 'AMBIENT'
   duration  Int    // duração em segundos
   audioUrl  String // URL pública do áudio no Supabase Storage
+}
+
+// Registro diário de humor e energia do usuário
+model MoodEntry {
+  id        String   @id @default(uuid())
+  mood      Int      // índice do emoji (0-4): 0=Mal, 1=Baixo, 2=Neutro, 3=Bem, 4=Ótimo
+  emoji     String   // emoji selecionado pelo usuário
+  energy    Int      // nível de energia 0-100
+  note      String?  // anotação opcional do dia
+  userId    String   // ID do Clerk (ex: user_2abc...)
+  createdAt DateTime @default(now())
 }

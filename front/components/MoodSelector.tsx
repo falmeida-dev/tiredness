@@ -29,7 +29,7 @@ export function MoodSelector({ selectMood, onSelect }: Props) {
                         key={index}
                         onPress={() => onSelect(index)}
                         activeOpacity={0.7}
-                        className={`items-center justify-center p-2 rounded-2xl border-2 w-[18%] aspect-square bg-background ${isSelecte ? 'border-primary' : 'border-primary/60'}`}
+                        className={`items-center justify-center p-2 rounded border-2 w-[18%] aspect-square bg-background ${isSelecte ? 'border-accent' : 'border-primary'}`}
                     >
                         <Text className="text-2xl">{mood.emoji}</Text>
                         <Text className={`text-sm font-medium ${isSelecte ? 'text-primary' : 'text-gray-500'}`}>{mood.label}</Text>

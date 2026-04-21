@@ -1,6 +1,6 @@
 import CardAcaoRapida from "@/components/CardAcaoRapida";
 import ListHeading from "@/components/ListHeading";
-import { MoodSelector } from "@/components/MoodSelector";
+import { MoodSelector, moods } from "@/components/MoodSelector";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { FLASHCARDS, HOME_PHRASES } from "@/constants/data";
 import "@/global.css";
@@ -9,6 +9,7 @@ import { styled } from "nativewind";
 import { useState } from "react";
 import { FlatList, Text, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
+import { router } from "expo-router";
 
 const SafeAreaView = styled(RNSafeAreaView)
 
@@ -27,6 +28,18 @@ export default function App() {
             await signOut();
         } catch (err) {
             console.error("Erro ao sair da conta", err);
+        }
+    };
+
+    // navega pra tela de humor levando o emoji selecionado na home
+    const handleMoodPress = () => {
+        if (mood !== null) {
+            router.push({
+                pathname: "/(tabs)/mood",
+                params: { initialMood: mood.toString() },
+            });
+        } else {
+            router.push("/(tabs)/mood");
         }
     };
 
@@ -67,6 +80,13 @@ export default function App() {
                         <View className="mb-2">
                             <Text className="text-heading text-lg font-bold my-4">Como você está se sentindo hoje?</Text>
                             <MoodSelector selectMood={mood} onSelect={setMood} />
+                            {/* botão para ir na tela de humor com o emoji selecionado */}
+                            {mood !== null && (
+                                <PrimaryButton
+                                    title={`Registrar como ${moods[mood].emoji}`}
+                                    onPress={handleMoodPress}
+                                />
+                            )}
                         </View>
                         {/* subtitulo - Ações rápidas */}
                         <ListHeading title="Ações rápidas" />
