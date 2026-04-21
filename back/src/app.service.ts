@@ -4,6 +4,6 @@ import { Injectable } from '@nestjs/common';
 export class AppService {
   getHello(): string {
     // se isso aparecer na tela, o deploy funcionou amem
-    return 'API do tiredness rodando liso! 🚀';
+    return 'API rodou';
   }
 }

@@ -14,6 +14,7 @@ const app_service_1 = require("./app.service");
 const prisma_module_1 = require("./prisma/prisma.module");
 const supabase_module_1 = require("./supabase/supabase.module");
 const tracks_module_1 = require("./tracks/tracks.module");
+const mood_module_1 = require("./mood/mood.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -24,6 +25,7 @@ exports.AppModule = AppModule = __decorate([
             prisma_module_1.PrismaModule,
             supabase_module_1.SupabaseModule,
             tracks_module_1.TracksModule,
+            mood_module_1.MoodModule,
         ],
         controllers: [app_controller_1.AppController],
         providers: [app_service_1.AppService],

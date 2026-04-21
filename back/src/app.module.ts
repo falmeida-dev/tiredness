@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
 import { SupabaseModule } from './supabase/supabase.module';
 import { TracksModule } from './tracks/tracks.module';
+import { MoodModule } from './mood/mood.module';
 
 @Module({
   imports: [
@@ -16,8 +17,11 @@ import { TracksModule } from './tracks/tracks.module';
     SupabaseModule,
     // as rotas de audio
     TracksModule,
+    // rotas de humor e energia
+    MoodModule,
   ],
   controllers: [AppController],
   providers: [AppService],
 })
 export class AppModule {}
+
