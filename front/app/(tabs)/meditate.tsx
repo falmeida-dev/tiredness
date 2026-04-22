@@ -1,13 +1,14 @@
 import { AmbientSoundCard } from "@/components/AmbientSoundCard";
 import { CategoryTab } from "@/components/CategoryTab";
 import { TrackCard } from "@/components/TrackCard";
+import { colors } from "@/constants/theme";
+import { useTabBarOffset } from "@/hooks/useTabBarOffset";
 import { getAmbientSounds, getMeditations } from "@/services/api";
 import { AudioTrack } from "@/types/track";
 import { Ionicons } from "@expo/vector-icons";
 import { AudioPlayer, createAudioPlayer, setAudioModeAsync, useAudioPlayer, useAudioPlayerStatus } from 'expo-audio';
 import React, { useEffect, useRef, useState } from "react";
 import { ActivityIndicator, SafeAreaView, ScrollView, Text, View } from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 
 
@@ -41,9 +42,7 @@ export default function MeditarScreen() {
   const [carregando, setCarregando] = useState(true);
   const [erro, setErro] = useState<string | null>(null);
 
-  const insets = useSafeAreaInsets();
-  // distância do fundo da tab bar: altura da tab + bottom inset/padding + margem extra
-  const tabBarBottomOffset = Math.max(insets.bottom, 20) + 72 + 12;
+  const tabBarBottomOffset = useTabBarOffset();
 
 
   // player de música (hook gerenciado pelo ciclo de vida do componente)
@@ -172,14 +171,14 @@ export default function MeditarScreen() {
           {/* spin de carregamento quando "puxa" a música */}
           {carregando && (
             <View className="flex-1 items-center justify-center py-12">
-              <ActivityIndicator size="large" color="#081126" />
+              <ActivityIndicator size="large" color={colors.primary} />
               <Text className="mt-4 font-bold text-lg">Carregando...</Text>
             </View>
           )}
 
           {erro && !carregando && (
             <View className="bg-surface-card rounded-3xl p-5 items-center">
-              <Ionicons name="cloud-offline-outline" size={32} color="#081126" />
+              <Ionicons name="cloud-offline-outline" size={32} color={colors.primary} />
               <Text className="text-status-alert font-bold mt-2">{erro}</Text>
             </View>
           )}

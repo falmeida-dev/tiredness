@@ -29,4 +29,6 @@ model MoodEntry {
   note      String?  // anotação opcional do dia
   userId    String   // ID do Clerk (ex: user_2abc...)
   createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }

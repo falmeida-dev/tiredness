@@ -20,7 +20,6 @@
     "@react-navigation/native": "^7.1.8",
     "axios": "^1.14.0",
     "clsx": "^2.1.1",
-    "dayjs": "^1.11.20",
     "expo": "~54.0.33",
     "expo-audio": "~1.1.1",
     "expo-auth-session": "~7.0.10",

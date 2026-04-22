@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMoodDto } from './create-mood.dto';
 
@@ -27,8 +27,25 @@ const SCORE_EMOJI: Record<number, string> = {
 export class MoodService {
   constructor(private readonly prisma: PrismaService) { }
 
-  // salva o registro de humor no banco
+  // salva o registro de humor no banco apenas 1 por dia por usuário
   async createMoodEntry(dto: CreateMoodDto) {
+    // verifica se já existe registro hoje para esse usuário
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const existing = await this.prisma.moodEntry.findFirst({
+      where: {
+        userId: dto.userId,
+        createdAt: { gte: today, lt: tomorrow },
+      },
+    });
+
+    if (existing) {
+      throw new ConflictException('Já existe um registro de humor para hoje.');
+    }
+
     return this.prisma.moodEntry.create({
       data: {
         mood: dto.mood,

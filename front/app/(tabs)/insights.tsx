@@ -1,14 +1,14 @@
+import { useTabBarOffset } from "@/hooks/useTabBarOffset";
 import { getWeeklySummary } from "@/services/api";
 import { WeeklySummary } from "@/types/mood";
 import { useUser } from "@clerk/expo";
 import { Ionicons } from "@expo/vector-icons";
-import React, { useCallback, useEffect, useState } from 'react';
+import { useFocusEffect } from 'expo-router';
+import React, { useCallback, useState } from 'react';
 import { ActivityIndicator, RefreshControl, SafeAreaView, ScrollView, Text, View } from 'react-native';
-import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 export default function RelatorioScreen() {
-  const insets = useSafeAreaInsets();
-  const tabBarBottomOffset = Math.max(insets.bottom, 20) + 72 + 12;
+  const tabBarBottomOffset = useTabBarOffset();
   const { user } = useUser();
 
   const [summary, setSummary] = useState<WeeklySummary | null>(null);
@@ -28,9 +28,33 @@ export default function RelatorioScreen() {
     }
   }, [user?.id]);
 
-  useEffect(() => {
-    fetchSummary();
-  }, [fetchSummary]);
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
+
+      const doFetch = async () => {
+        if (!user?.id) return;
+        try {
+          setLoading(true);
+          const data = await getWeeklySummary(user.id);
+          if (isActive) setSummary(data);
+        } catch (error) {
+          console.error('Erro ao buscar resumo semanal:', error);
+        } finally {
+          if (isActive) {
+            setLoading(false);
+            setRefreshing(false);
+          }
+        }
+      };
+
+      doFetch();
+
+      return () => {
+        isActive = false;
+      };
+    }, [user?.id])
+  );
 
   const onRefresh = () => {
     setRefreshing(true);

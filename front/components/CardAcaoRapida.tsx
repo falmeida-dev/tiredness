@@ -14,7 +14,7 @@ const CardAcaoRapida = ({ title, description, img, color, page }: { title: strin
     // fazer um card com a imagem do lado esquerdo, o título e descrição do lado direito e um ícone de seta para direita no final do card, o card deve ser clicável e levar para a página correspondente
     <Pressable onPress={handlePress} className={clsx('sub-card', 'bg-card')} style={color ? { backgroundColor: color } : undefined}>
       <View className='sub-head'>
-        <Image source={img} className='w-25 h-25 rounded-2xl mr-3' resizeMode='cover' />
+        <Image source={img} className='w-16 h-16 rounded-2xl mr-3' resizeMode='cover' />
         <View className='sub-main'>
           <View className='sub-copy'>
             <Text numberOfLines={1} className="sub-title">{title}</Text>
