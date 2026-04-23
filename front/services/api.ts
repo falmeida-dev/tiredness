@@ -2,7 +2,7 @@ import { AudioTrack } from '@/types/track';
 import { MoodEntry, WeeklySummary } from '@/types/mood';
 import axios from 'axios';
 
-const BASE_URL = 'https://api-tiredness-production.up.railway.app';
+const BASE_URL = 'https://tired-ness.onrender.com';
 
 const api = axios.create({
     baseURL: BASE_URL,
@@ -19,10 +19,7 @@ export const getAmbientSounds = async (): Promise<AudioTrack[]> => {
     return data;
 };
 
-export const getAllTracks = async () => {
-    const { data } = await api.get('/tracks')
-    return data;
-};
+
 
 // salva um registro de humor no banco
 export const createMoodEntry = async (payload: {

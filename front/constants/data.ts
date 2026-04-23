@@ -8,9 +8,6 @@ export const tabs = [
     { name: "insights", title: "relatórios", icon: icons.activity },
 ]
 
-export const HOME_USER = {
-    name: "Amigo(a)!",
-}
 
 export const HOME_PHRASES = {
     motivational: "Acredite sempre em si mesmo e em sua capacidade de superar desafios. Você é mais forte do que imagina!",

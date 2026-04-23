@@ -1,3 +1,4 @@
+import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 
@@ -8,6 +9,9 @@ async function bootstrap() {
   app.enableCors({
     origin: '*',
   });
+
+  // valida automaticamente os DTOs com class-validator
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   // tudo vai ficar dentro do /api
   app.setGlobalPrefix('api');

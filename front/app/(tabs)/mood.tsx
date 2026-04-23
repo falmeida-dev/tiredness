@@ -1,13 +1,15 @@
 import { EnergySlider } from '@/components/EnergySlider';
 import { MoodSelector, moods } from '@/components/MoodSelector';
 import { PrimaryButton } from '@/components/PrimaryButton';
+import { colors } from '@/constants/theme';
 import { createMoodEntry } from '@/services/api';
 import { useUser } from '@clerk/expo';
 import { Ionicons } from '@expo/vector-icons';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, router } from 'expo-router';
 import React, { useEffect, useState } from 'react';
-import { Alert, KeyboardAvoidingView, SafeAreaView, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, SafeAreaView, ScrollView, Text, TextInput, View, ActivityIndicator } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 
@@ -20,6 +22,30 @@ export default function HumorScreen() {
   const [energia, setEnergia] = useState(50);
   const [carregando, setCarregando] = useState(false);
   const [nota, setNota] = useState('');
+  const [jaRegistrouHoje, setJaRegistrouHoje] = useState(false);
+  const [loadingVerificacao, setLoadingVerificacao] = useState(true);
+
+  // verifica se já registrou no async storage hoje
+  useEffect(() => {
+    const verificarRegistro = async () => {
+      if (!user?.id) return;
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const key = `@mood_recorded_${user.id}_${today}`;
+      try {
+        const registrado = await AsyncStorage.getItem(key);
+        if (registrado === 'true') {
+          setJaRegistrouHoje(true);
+        }
+      } catch (error) {
+        console.error("Erro ao verificar AsyncStorage:", error);
+      } finally {
+        setLoadingVerificacao(false);
+      }
+    };
+
+    verificarRegistro();
+  }, [user?.id]);
 
   // se veio um mood da home, já pré-seleciona o emoji
   useEffect(() => {
@@ -53,12 +79,15 @@ export default function HumorScreen() {
         userId: user.id,
       });
 
+      // marca como registrado hoje no local storage
+      const now = new Date();
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+      const key = `@mood_recorded_${user.id}_${today}`;
+      await AsyncStorage.setItem(key, 'true');
+      setJaRegistrouHoje(true);
+
       Alert.alert('Salvo!', 'Seu humor e energia foram registrados com sucesso.');
 
-      // limpa o formulário depois de salvar
-      setHumor(null);
-      setEnergia(50);
-      setNota('');
     } catch (error) {
       console.error('Erro ao salvar humor:', error);
       Alert.alert('Erro', 'Não foi possível salvar o humor. Tente novamente.');
@@ -66,6 +95,27 @@ export default function HumorScreen() {
       setCarregando(false);
     }
   };
+
+  if (loadingVerificacao) {
+    return (
+      <SafeAreaView className="flex-1 bg-background justify-center items-center">
+        <ActivityIndicator size="large" color={colors.accent} />
+      </SafeAreaView>
+    );
+  }
+
+  if (jaRegistrouHoje) {
+    return (
+      <SafeAreaView className="flex-1 bg-background justify-center items-center px-6">
+        <Ionicons name="checkmark-circle" size={80} color={colors.primary} />
+        <Text className="text-text-heading text-3xl font-extrabold text-center mt-6">Tudo certo por hoje!</Text>
+        <Text className="text-lg text-center mt-4 mb-8 text-muted-foreground">
+          Você já registrou seu humor hoje. Volte amanhã para um novo registro e continue acompanhando seu bem-estar!
+        </Text>
+        <PrimaryButton title="Voltar" onPress={() => router.replace('/(tabs)')} />
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView className="flex-1 bg-background py-10">

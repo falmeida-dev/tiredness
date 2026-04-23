@@ -1,23 +1,53 @@
 import CardAcaoRapida from "@/components/CardAcaoRapida";
 import ListHeading from "@/components/ListHeading";
-import { MoodSelector, moods } from "@/components/MoodSelector";
 import { PrimaryButton } from "@/components/PrimaryButton";
 import { FLASHCARDS, HOME_PHRASES } from "@/constants/data";
 import "@/global.css";
+import { getWeeklySummary } from "@/services/api";
+import { WeeklySummary } from "@/types/mood";
 import { useAuth, useUser } from "@clerk/expo";
+import { Ionicons } from "@expo/vector-icons";
+import { router, useFocusEffect } from "expo-router";
 import { styled } from "nativewind";
-import { useState } from "react";
-import { FlatList, Text, View } from "react-native";
+import { useCallback, useState } from "react";
+import { ActivityIndicator, FlatList, Text, TouchableOpacity, View } from "react-native";
 import { SafeAreaView as RNSafeAreaView } from "react-native-safe-area-context";
-import { router } from "expo-router";
 
 const SafeAreaView = styled(RNSafeAreaView)
 
 export default function App() {
     const { user } = useUser();
     const { signOut } = useAuth();
-    const [mood, setMood] = useState<number | null>(null);
+    const [summary, setSummary] = useState<WeeklySummary | null>(null);
+    const [loadingSummary, setLoadingSummary] = useState(true);
     const name = user?.firstName || user?.username || "Amigo";
+
+    useFocusEffect(
+        useCallback(() => {
+            let isActive = true;
+
+            const fetchSummary = async () => {
+                if (!user?.id) return;
+                try {
+                    setLoadingSummary(true);
+                    const data = await getWeeklySummary(user.id);
+                    if (isActive) {
+                        setSummary(data);
+                    }
+                } catch (error) {
+                    console.error('Erro ao buscar resumo na home:', error);
+                } finally {
+                    if (isActive) setLoadingSummary(false);
+                }
+            };
+
+            fetchSummary();
+
+            return () => {
+                isActive = false;
+            };
+        }, [user?.id])
+    );
 
     // trocar a mensagem de acordo com o horário do dia, se for dia "Bom dia", se for tarde "Boa tarde" e se for noite "Boa noite"
     const hour = new Date().getHours();
@@ -28,18 +58,6 @@ export default function App() {
             await signOut();
         } catch (err) {
             console.error("Erro ao sair da conta", err);
-        }
-    };
-
-    // navega pra tela de humor levando o emoji selecionado na home
-    const handleMoodPress = () => {
-        if (mood !== null) {
-            router.push({
-                pathname: "/(tabs)/mood",
-                params: { initialMood: mood.toString() },
-            });
-        } else {
-            router.push("/(tabs)/mood");
         }
     };
 
@@ -76,18 +94,41 @@ export default function App() {
                             </View>
                         </View>
                         {/* fim do card de frase */}
-                        {/* card de selecionar humor */}
-                        <View className="mb-2">
-                            <Text className="text-heading text-lg font-bold my-4">Como você está se sentindo hoje?</Text>
-                            <MoodSelector selectMood={mood} onSelect={setMood} />
-                            {/* botão para ir na tela de humor com o emoji selecionado */}
-                            {mood !== null && (
-                                <PrimaryButton
-                                    title={`Registrar como ${moods[mood].emoji}`}
-                                    onPress={handleMoodPress}
-                                />
-                            )}
-                        </View>
+                        {/* card de nível de humor médio */}
+                        <TouchableOpacity
+                            activeOpacity={0.8}
+                            onPress={() => router.push("/(tabs)/insights")}
+                            className="bg-background border border-primary p-4 rounded mb-4 mt-2"
+                        >
+                            <View className="flex-row items-center justify-between">
+                                <View className="flex-1 justify-center">
+                                    <View className="flex-row items-center mb-1">
+                                        {/* <View className="bg-accent/10 p-2 rounded-full mr-2">
+                                            <Ionicons name="stats-chart" size={16} color="#ea7a53" />
+                                        </View> */}
+                                        <Text className="text-primary font-bold text-lg">Nível de humor</Text>
+                                    </View>
+                                    <Text className="text-muted-foreground font-medium text-sm  mb-3">
+                                        {summary?.totalEntries === 0 ? "Sem dados nessa semana" : "Média dessa semana"}
+                                    </Text>
+                                    <View className="flex-row items-center mt-1">
+                                        <Text className="text-muted-foreground font-bold text-sm text-primary">Ver relatórios</Text>
+                                        <Ionicons name="arrow-forward" size={12} color="#081126" />
+                                    </View>
+                                </View>
+
+                                {loadingSummary ? (
+                                    <View className="w-24 h-24 items-center justify-center">
+                                        <ActivityIndicator size="small" color="#ea7a53" />
+                                    </View>
+                                ) : (
+                                    <View className="items-center justify-center border-[5px] border-accent/20 rounded-full w-24 h-24 ml-2">
+                                        <Text className="text-3xl font-extrabold text-primary">{summary?.averageMood ?? 0}%</Text>
+                                        <Text className="text-xl mt-0.5">{summary?.moodEmoji ?? "😐"}</Text>
+                                    </View>
+                                )}
+                            </View>
+                        </TouchableOpacity>
                         {/* subtitulo - Ações rápidas */}
                         <ListHeading title="Ações rápidas" />
                     </>

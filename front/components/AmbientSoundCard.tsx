@@ -30,7 +30,7 @@ export const AmbientSoundCard = ({ label, icon, isActive, isLoading, onPress }: 
                 }
             </View>
 
-            <Text className={`font-medium ${isActive ? 'text-primary' : 'text-primary'}`}>
+            <Text className={'font-medium text-primary'}>
                 {isLoading ? "" : label}
             </Text>
 

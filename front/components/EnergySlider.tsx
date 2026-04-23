@@ -1,3 +1,4 @@
+import { colors } from "@/constants/theme";
 import Slider from "@react-native-community/slider";
 import { Text, View } from "react-native";
 type Props = {
@@ -15,7 +16,7 @@ export const EnergySlider = ({ value, onChange }: Props) => {
                 step={1}
                 value={value}
                 onValueChange={onChange}
-                minimumTrackTintColor="#ea7a53"
+                minimumTrackTintColor={colors.accent}
                 maximumTrackTintColor="#121417"
                 thumbTintColor="#FFF"
             />
