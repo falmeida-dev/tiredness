@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { colors, fonts, radius } from '../theme/colors';
 
-// opcoes de humor com valor 1-5, icone e rotulo
+// opcoes de humor com valor icone e rotulo
 const OPCOES_HUMOR = [
   { value: 1, Icon: Angry,  label: 'Mal'    },
   { value: 2, Icon: Frown,  label: 'Baixo'  },
@@ -181,19 +181,25 @@ export default function MoodTrackerScreen() {
 
   async function verificarCheckinHoje() {
     try {
-      const raw = await AsyncStorage.getItem('checkins');
-      const lista = raw ? JSON.parse(raw) : [];
-      const hoje = localDateKey();
-      // verifica se ja tem um checkin com a data de hoje
-      if (Array.isArray(lista)) {
-        let achou = false;
-        for (let i = 0; i < lista.length; i++) {
-          if (lista[i] && lista[i].date === hoje) {
-            achou = true;
-            break;
+      const userStr = await AsyncStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const raw = await AsyncStorage.getItem(`checkins_${user.email}`);
+        const lista = raw ? JSON.parse(raw) : [];
+        const hoje = localDateKey();
+        // verifica se ja tem um checkin com a data de hoje
+        if (Array.isArray(lista)) {
+          let achou = false;
+          for (let i = 0; i < lista.length; i++) {
+            if (lista[i] && lista[i].date === hoje) {
+              achou = true;
+              break;
+            }
           }
+          setJaFezCheckin(achou);
+        } else {
+          setJaFezCheckin(false);
         }
-        setJaFezCheckin(achou);
       } else {
         setJaFezCheckin(false);
       }
@@ -218,17 +224,23 @@ export default function MoodTrackerScreen() {
     };
 
     try {
-      // pega a lista atual e adiciona o novo checkin
-      const raw = await AsyncStorage.getItem('checkins');
-      const lista = raw ? JSON.parse(raw) : [];
-      const listaCheckins = Array.isArray(lista) ? lista : [];
-      listaCheckins.push(checkin);
+      const userStr = await AsyncStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const key = `checkins_${user.email}`;
 
-      // salva o checkin com a data de hoje
-      await AsyncStorage.setItem('checkins', JSON.stringify(listaCheckins));
+        // pega a lista atual e adiciona o novo checkin
+        const raw = await AsyncStorage.getItem(key);
+        const lista = raw ? JSON.parse(raw) : [];
+        const listaCheckins = Array.isArray(lista) ? lista : [];
+        listaCheckins.push(checkin);
 
-      Alert.alert('Registrado!', 'Seu check-in de hoje foi salvo.');
-      setJaFezCheckin(true);
+        // salva o checkin com a data de hoje
+        await AsyncStorage.setItem(key, JSON.stringify(listaCheckins));
+
+        Alert.alert('Registrado!', 'Seu check-in de hoje foi salvo.');
+        setJaFezCheckin(true);
+      }
     } catch (e) {
       console.log('deu erro ao salvar checkin:', e);
       Alert.alert('Erro', 'Não foi possível salvar.');
@@ -329,12 +341,6 @@ const styles = StyleSheet.create({
     backgroundColor: colors.white,
     flex: 1,
     marginHorizontal: 3,
-    aspectRatio: 1,
-    elevation: 1,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
   botaoHumorAtivo: {
     borderColor: colors.primary,

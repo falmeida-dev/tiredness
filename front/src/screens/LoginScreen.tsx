@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from 'react';
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { colors, fonts, radius } from '../theme/colors';
 
 export default function LoginScreen({ navigation }: any) {
@@ -14,13 +14,21 @@ export default function LoginScreen({ navigation }: any) {
     }
 
     try {
-      // pega o usuario salvo no celular
-      const userStr = await AsyncStorage.getItem('user');
-      if (userStr) {
-        const user = JSON.parse(userStr);
-        // verifica se o email e senha batem com o que foi cadastrado
-        if (user.email === email && user.password === senha) {
-          Alert.alert('Sucesso', 'Login realizado com sucesso!');
+      // pega os usuarios cadastrados no celular
+      const usersDbStr = await AsyncStorage.getItem('users_db');
+      const usersDb = usersDbStr ? JSON.parse(usersDbStr) : [];
+
+      if (Array.isArray(usersDb) && usersDb.length > 0) {
+        const emailLower = email.toLowerCase().trim();
+        const user = usersDb.find(
+          (u: any) => u && u.email && u.email.toLowerCase().trim() === emailLower && u.password === senha
+        );
+
+        if (user) {
+          // Alert.alert('Sucesso', 'Login realizado com sucesso!');
+          // salva o usuario atual na sessao ativa
+          await AsyncStorage.setItem('user', JSON.stringify(user));
+          
           // navega pro lugar certo dependendo se ja fez o quiz ou nao
           if (user.firstAccess) {
             navigation.replace('BurnoutQuiz');
@@ -42,7 +50,14 @@ export default function LoginScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
+      <View style={{alignItems: 'center'}}>
+        <Image
+        source={require('../../assets/images/logo-tiredness.png')}
+        style={{ width: 70, height: 70, borderRadius: 10, alignItems: 'center' }}
+        resizeMode="contain"
+        />
       <Text style={styles.titulo}>TiredNess</Text>
+      </View>
 
       <View style={styles.formulario}>
         <TextInput

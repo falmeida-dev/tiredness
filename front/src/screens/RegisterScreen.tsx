@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { useState } from 'react';
+import { Alert, Image, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { colors, fonts, radius } from '../theme/colors';
 
 export default function RegisterScreen({ navigation }: any) {
@@ -15,9 +15,26 @@ export default function RegisterScreen({ navigation }: any) {
     }
 
     try {
-      // salva o usuario no celular com firstAccess true pra mandar pro quiz
-      const user = { name: nome, email, password: senha, firstAccess: true };
-      await AsyncStorage.setItem('user', JSON.stringify(user));
+      // pega a lista atual de usuarios cadastrados
+      const usersDbStr = await AsyncStorage.getItem('users_db');
+      const usersDb = usersDbStr ? JSON.parse(usersDbStr) : [];
+
+      // verifica se ja existe usuario com esse email
+      const emailLower = email.toLowerCase().trim();
+      const existe = Array.isArray(usersDb) && usersDb.some(
+        (u: any) => u && u.email && u.email.toLowerCase().trim() === emailLower
+      );
+
+      if (existe) {
+        Alert.alert('Erro', 'Este e-mail já está cadastrado.');
+        return;
+      }
+
+      // cria o novo usuario com firstAccess true pra mandar pro quiz
+      const novoUsuario = { name: nome.trim(), email: email.trim(), password: senha, firstAccess: true };
+      const novaLista = Array.isArray(usersDb) ? [...usersDb, novoUsuario] : [novoUsuario];
+
+      await AsyncStorage.setItem('users_db', JSON.stringify(novaLista));
       Alert.alert('Sucesso', 'Cadastro realizado com sucesso!');
       // volta pro login depois de cadastrar
       navigation.navigate('Login');
@@ -29,7 +46,17 @@ export default function RegisterScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.titulo}>TiredNess</Text>
+
+      <View style={{alignItems: 'center'}}>
+              <Image
+              source={require('../../assets/images/logo-tiredness.png')}
+              style={{ width: 70, height: 70, borderRadius: 10, alignItems: 'center' }}
+              resizeMode="contain"
+              />
+            <Text style={styles.titulo}>TiredNess</Text>
+        </View>
+
+      
 
       <View style={styles.formulario}>
         <TextInput

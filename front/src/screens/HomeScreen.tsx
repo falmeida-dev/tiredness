@@ -1,18 +1,18 @@
-import React, { useState, useCallback } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useFocusEffect } from '@react-navigation/native';
+import { Brain, NotebookPen, Smile, SmilePlus } from 'lucide-react-native';
+import React, { useCallback, useState } from 'react';
 import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  TextInput,
   Alert,
   KeyboardAvoidingView,
   Platform,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { useFocusEffect } from '@react-navigation/native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { SmilePlus, Brain, NotebookPen, Smile } from 'lucide-react-native';
 import { colors, fonts, radius } from '../theme/colors';
 
 // frases que trocam a cada dia
@@ -77,35 +77,37 @@ export default function HomeScreen({ navigation }: any) {
         if (user && user.name) {
           setNomeUsuario(user.name);
         }
-      }
 
-      // pega os checkins e calcula a media de humor da semana
-      const checkinsStr = await AsyncStorage.getItem('checkins');
-      if (checkinsStr) {
-        const checkins = JSON.parse(checkinsStr);
-        if (Array.isArray(checkins)) {
-          const inicioSemana = getInicioSemana();
+        // pega os checkins e calcula a media de humor da semana
+        const checkinsStr = await AsyncStorage.getItem(`checkins_${user.email}`);
+        if (checkinsStr) {
+          const checkins = JSON.parse(checkinsStr);
+          if (Array.isArray(checkins)) {
+            const inicioSemana = getInicioSemana();
 
-          // filtra so os checkins desta semana
-          const checkinsSemana = [];
-          for (let i = 0; i < checkins.length; i++) {
-            const c = checkins[i];
-            if (!c) continue;
-            const dataCheckin = c.timestamp ? new Date(c.timestamp) : new Date(c.date + 'T12:00:00');
-            if (dataCheckin >= inicioSemana) {
-              checkinsSemana.push(c);
+            // filtra so os checkins desta semana
+            const checkinsSemana = [];
+            for (let i = 0; i < checkins.length; i++) {
+              const c = checkins[i];
+              if (!c) continue;
+              const dataCheckin = c.timestamp ? new Date(c.timestamp) : new Date(c.date + 'T12:00:00');
+              if (dataCheckin >= inicioSemana) {
+                checkinsSemana.push(c);
+              }
             }
-          }
 
-          // calcula a media de humor da semana
-          if (checkinsSemana.length > 0) {
-            let somaHumor = 0;
-            for (let i = 0; i < checkinsSemana.length; i++) {
-              somaHumor += checkinsSemana[i].mood;
+            // calcula a media de humor da semana
+            if (checkinsSemana.length > 0) {
+              let somaHumor = 0;
+              for (let i = 0; i < checkinsSemana.length; i++) {
+                somaHumor += checkinsSemana[i].mood;
+              }
+              setMediaHumorSemana(somaHumor / checkinsSemana.length);
+            } else {
+              // se nao tiver dado ainda mostra nulo
+              setMediaHumorSemana(null);
             }
-            setMediaHumorSemana(somaHumor / checkinsSemana.length);
           } else {
-            // se nao tiver dado ainda mostra nulo
             setMediaHumorSemana(null);
           }
         } else {
@@ -128,17 +130,57 @@ export default function HomeScreen({ navigation }: any) {
     }
 
     try {
-      // pega a lista atual de gratidoes
-      const existente = await AsyncStorage.getItem('gratitude');
-      const lista: { text: string; date: string }[] = existente ? JSON.parse(existente) : [];
-      // adiciona a nova gratidao com a data de hoje
-      lista.push({ text: texto, date: new Date().toISOString() });
-      await AsyncStorage.setItem('gratitude', JSON.stringify(lista));
-      setTextoGratidao('');
-      Alert.alert('Salvo', 'Gratidão registrada com sucesso!');
+      const userStr = await AsyncStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const key = `gratitude_${user.email}`;
+
+        // pega a lista atual de gratidoes
+        const existente = await AsyncStorage.getItem(key);
+        const lista: { text: string; date: string }[] = existente ? JSON.parse(existente) : [];
+        // adiciona a nova gratidao com a data de hoje
+        lista.push({ text: texto, date: new Date().toISOString() });
+        await AsyncStorage.setItem(key, JSON.stringify(lista));
+        setTextoGratidao('');
+        Alert.alert('Salvo', 'Gratidão registrada com sucesso!');
+      }
     } catch (e) {
       console.log('deu erro ao salvar gratidao:', e);
       Alert.alert('Erro', 'Não foi possível salvar.');
+    }
+  };
+
+  // abre um alerta para confirmar a saída
+  const confirmarSair = () => {
+    Alert.alert(
+      'Sair da conta',
+      'Tem certeza que quer sair?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Sair',
+          style: 'destructive',
+          onPress: realizarLogout,
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  // realiza o logout limpando a chave user e resetando a navegação
+  const realizarLogout = async () => {
+    try {
+      await AsyncStorage.removeItem('user');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (e) {
+      console.log('Erro ao sair da conta:', e);
+      Alert.alert('Erro', 'Não foi possível sair da conta.');
     }
   };
 
@@ -256,6 +298,15 @@ export default function HomeScreen({ navigation }: any) {
             <Text style={styles.botaoSalvarTexto}>Salvar</Text>
           </TouchableOpacity>
         </View>
+
+        {/* botão discreto de sair da conta */}
+        <TouchableOpacity
+          style={styles.botaoSair}
+          activeOpacity={0.7}
+          onPress={confirmarSair}
+        >
+          <Text style={styles.botaoSairTexto}>Sair da conta</Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
@@ -415,5 +466,17 @@ const styles = StyleSheet.create({
     color: colors.white,
     ...fonts.body,
     fontWeight: '700',
+  },
+  botaoSair: {
+    marginTop: 32,
+    alignSelf: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+  },
+  botaoSairTexto: {
+    color: '#CC4444',
+    fontSize: 12,
+    fontWeight: '500',
+    textAlign: 'center',
   },
 });

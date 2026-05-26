@@ -41,7 +41,7 @@ function getInicioSemana(): Date {
 }
 
 // tipo do status de burnout
-type StatusBurnout = 'verde' | 'amarelo' | 'vermelho';
+type StatusBurnout = 'verde' | 'amarelo' | 'vermelho' | 'sem_dados';
 
 // calcula o status de burnout baseado nos checkins
 function calcularStatusBurnout(checkins: Checkin[]): StatusBurnout {
@@ -57,37 +57,36 @@ function calcularStatusBurnout(checkins: Checkin[]): StatusBurnout {
     }
   }
 
-  // se nao tiver dados da semana fica no amarelo por falta de informacao
-  if (checkinsSemana.length === 0) return 'amarelo';
+  //  quando não tem nenhum checkin na semana
+  if (checkinsSemana.length === 0) {
+    return 'sem_dados';
+  }
 
-  // verifica se teve 3 dias seguidos ruins — vermelho
-  // primeiro monta um conjunto de datas com dia ruim
-  const diasRuins = new Set<string>();
-  for (let i = 0; i < checkins.length; i++) {
-    const c = checkins[i];
-    // dia ruim = humor <= 2 OU energia abaixo de 30%
-    if (c.mood <= 2 || c.energy < 30) {
-      diasRuins.add(c.date);
+  // só aparece se humor < 2 OU energia < 30 em 3 ou mais dias CONSECUTIVOS nos últimos 7 dias
+  const ultimos7Dias: string[] = [];
+  for (let i = 6; i >= 0; i--) {
+    ultimos7Dias.push(localDateKey(i));
+  }
+
+  const diaFoiRuim = ultimos7Dias.map(data => 
+    checkins.some(c => c.date === data && (c.mood < 2 || c.energy < 30))
+  );
+
+  let consecutivos = 0;
+  let temSequenciaVermelha = false;
+  for (const ruim of diaFoiRuim) {
+    if (ruim) {
+      consecutivos++;
+      if (consecutivos >= 3) {
+        temSequenciaVermelha = true;
+      }
+    } else {
+      consecutivos = 0;
     }
   }
 
-  // verifica se algum dia e os dois anteriores foram todos ruins (3 consecutivos)
-  for (let i = 0; i < checkins.length; i++) {
-    const c = checkins[i];
-    if (c.mood <= 2 || c.energy < 30) {
-      const dataRef = new Date(c.date + 'T12:00:00');
-
-      const diaMenos1 = new Date(dataRef);
-      diaMenos1.setDate(diaMenos1.getDate() - 1);
-
-      const diaMenos2 = new Date(dataRef);
-      diaMenos2.setDate(diaMenos2.getDate() - 2);
-
-      // se o dia atual e os dois anteriores foram ruins = sequencia de 3 dias ruins
-      if (diasRuins.has(formatarDataChave(diaMenos1)) && diasRuins.has(formatarDataChave(diaMenos2))) {
-        return 'vermelho';
-      }
-    }
+  if (temSequenciaVermelha) {
+    return 'vermelho';
   }
 
   // calcula media de humor e energia da semana
@@ -100,12 +99,12 @@ function calcularStatusBurnout(checkins: Checkin[]): StatusBurnout {
   const mediaHumor = somaHumor / checkinsSemana.length;
   const mediaEnergia = somaEnergia / checkinsSemana.length;
 
-  // verde se humor >= 3 e energia >= 50%
+  // mediaHumor >= 3 E mediaEnergia >= 50
   if (mediaHumor >= 3 && mediaEnergia >= 50) {
     return 'verde';
   }
 
-  // amarelo se humor entre 2-3 ou energia entre 30-50
+  // mediaHumor >= 3 E mediaEnergia < 50 
   return 'amarelo';
 }
 
@@ -115,20 +114,28 @@ function getInfoBurnout(status: StatusBurnout): { cor: string; titulo: string; m
     return {
       cor: '#4CAF50',
       titulo: 'Você está bem!',
-      mensagem: 'Seu humor e energia estão equilibrados esta semana. Continue cuidando de você!',
+      mensagem: 'Você está equilibrado! Continue assim.',
     };
   }
   if (status === 'amarelo') {
     return {
       cor: '#FFC107',
       titulo: 'Atenção ao equilíbrio',
-      mensagem: 'Seus níveis estão um pouco abaixo do ideal. Que tal uma pausa ou algo que te faz bem?',
+      mensagem: 'Sua energia está um pouco baixa. Tente descansar mais.',
     };
   }
+  if (status === 'vermelho') {
+    return {
+      cor: '#F44336',
+      titulo: 'Risco de esgotamento',
+      mensagem: 'Você está apresentando sinais de esgotamento. Considere conversar com alguém.',
+    };
+  }
+  // status === 'sem_dados'
   return {
-    cor: '#F44336',
-    titulo: 'Risco de esgotamento',
-    mensagem: 'Você está com energia e humor baixos há vários dias. Dê-se permissão para descansar. Você merece cuidado.',
+    cor: '#9E9E9E',
+    titulo: 'Sem dados',
+    mensagem: 'Nenhum registro essa semana. Que tal fazer seu primeiro check-in?',
   };
 }
 
@@ -136,7 +143,9 @@ function getInfoBurnout(status: StatusBurnout): { cor: string; titulo: string; m
 function IconeBurnout({ status }: { status: StatusBurnout }) {
   if (status === 'verde') return <ShieldCheck size={28} color="#4CAF50" />;
   if (status === 'amarelo') return <AlertTriangle size={28} color="#FFC107" />;
-  return <AlertOctagon size={28} color="#F44336" />;
+  if (status === 'vermelho') return <AlertOctagon size={28} color="#F44336" />;
+  // status === 'sem_dados'
+  return <AlertTriangle size={28} color="#9E9E9E" />;
 }
 
 // tela de relatorio
@@ -153,9 +162,15 @@ export default function ReportScreen() {
   // pega os checkins salvos no celular
   async function carregarCheckins() {
     try {
-      const raw = await AsyncStorage.getItem('checkins');
-      const lista = raw ? JSON.parse(raw) : [];
-      setCheckins(Array.isArray(lista) ? lista : []);
+      const userStr = await AsyncStorage.getItem('user');
+      if (userStr) {
+        const user = JSON.parse(userStr);
+        const raw = await AsyncStorage.getItem(`checkins_${user.email}`);
+        const lista = raw ? JSON.parse(raw) : [];
+        setCheckins(Array.isArray(lista) ? lista : []);
+      } else {
+        setCheckins([]);
+      }
     } catch (e) {
       console.log('deu erro ao carregar checkins:', e);
       setCheckins([]);

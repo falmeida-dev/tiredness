@@ -1,6 +1,15 @@
 {
   "expo": {
     "name": "TiredNess",
-    "slug": "tiredness"
+    "slug": "tiredness",
+    "extra": {
+      "eas": {
+        "projectId": "d7a5fbb7-7346-408f-8c4f-5142e8b8723d"
+      }
+    },
+    "owner": "fernando_asc",
+    "android": {
+      "package": "com.fernando_asc.tiredness"
+    }
   }
 }

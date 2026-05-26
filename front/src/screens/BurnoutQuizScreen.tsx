@@ -75,16 +75,33 @@ export default function BurnoutQuizScreen({ navigation }: any) {
     setMostrarResultado(true);
 
     try {
-      // salva o resultado do burnout no celular
-      const resultadoObj = { score: pontuacaoFinal, level: nivel, date: new Date().toISOString() };
-      await AsyncStorage.setItem('burnoutResult', JSON.stringify(resultadoObj));
-
-      // atualiza o usuario pra dizer que ja fez o quiz (firstAccess = false)
+      // pega o usuario da sessao ativa
       const userStr = await AsyncStorage.getItem('user');
       if (userStr) {
         const userObj = JSON.parse(userStr);
         userObj.firstAccess = false;
+        
+        // atualiza o usuario pra dizer que ja fez o quiz (firstAccess = false) na sessao ativa
         await AsyncStorage.setItem('user', JSON.stringify(userObj));
+
+        // salva o resultado do burnout específico desse usuário
+        const resultadoObj = { score: pontuacaoFinal, level: nivel, date: new Date().toISOString() };
+        await AsyncStorage.setItem(`burnoutResult_${userObj.email}`, JSON.stringify(resultadoObj));
+
+        // atualiza também na lista de usuários cadastrados (users_db)
+        const usersDbStr = await AsyncStorage.getItem('users_db');
+        if (usersDbStr) {
+          const usersDb = JSON.parse(usersDbStr);
+          if (Array.isArray(usersDb)) {
+            const index = usersDb.findIndex(
+              (u: any) => u && u.email && u.email.toLowerCase().trim() === userObj.email.toLowerCase().trim()
+            );
+            if (index !== -1) {
+              usersDb[index].firstAccess = false;
+              await AsyncStorage.setItem('users_db', JSON.stringify(usersDb));
+            }
+          }
+        }
       }
     } catch (e) {
       console.log('deu erro ao salvar resultado do quiz:', e);
