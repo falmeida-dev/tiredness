@@ -8,6 +8,10 @@
       }
     },
     "owner": "fernando_asc",
+    "plugins": [
+      "expo-av",
+      "expo-font"
+    ],
     "android": {
       "package": "com.fernando_asc.tiredness"
     }
